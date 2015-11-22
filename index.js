@@ -16,7 +16,6 @@ app.get('/js', function (req, res) {
   res.sendFile(path.join(__dirname + '/public/slave.js'));
 });
 
-
 var server = app.listen(8090, function () {
   var host = server.address().address;
   var port = server.address().port;

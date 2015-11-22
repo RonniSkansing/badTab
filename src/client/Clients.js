@@ -92,7 +92,10 @@ module.exports = {
       }
       that.broadcast(data);
     });
-  },  
+  },
+  list() {
+    return clientPool.list();
+  },
   remove(id) {
     clientPool.remove(id);
   }
