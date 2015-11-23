@@ -1,5 +1,5 @@
 var uri = location.search.match(/___ws=([^&]+)/);
-var wss = uri ? uri : 'ws://localhost:8080';
+var wss = uri ? uri : 'ws://localhost:1337';
 var reconnectTries = 0;
 var lastReconnectTries = 0;
 var timeoutId;

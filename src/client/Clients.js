@@ -12,8 +12,8 @@ function auth(user, pass) {
 }
 
 module.exports = {
-  add(client, nick) {
-    return clientPool.add(client, nick);
+  add(ip, origin, agent, client, sender) {
+    return clientPool.add(ip, origin, agent, client, sender);
   },
   auth(id, user, pass) {
     if(auth(user,pass) === false) {

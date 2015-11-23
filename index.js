@@ -2,7 +2,7 @@ var repl = require('repl');
 var path = require('path');
 var commands = require('./src/Commands.js');
 var config = require('./config.js');
-var clients = require('./src/Client/Clients.js');
+var clients = require('./src/client/Clients.js');
 var output = require('./src/Utils.js');
 var wss = require('./src/WebSocketServerFactory.js');
 var repl = require('./src/Repl.js');
@@ -16,15 +16,22 @@ app.get('/js', function (req, res) {
   res.sendFile(path.join(__dirname + '/public/slave.js'));
 });
 
-var server = app.listen(8090, function () {
-  var host = server.address().address;
-  var port = server.address().port;
-
-  console.log('slave html/js listening at http://%s:%s', host, port);
+var server = app.listen(config.ws.port, function () {
+  var webServer = server.address();
+  console.log(
+    'slave html/js listening at http://%s:%s',
+    webServer.address,
+    webServer.port
+  );
 });
 
 wss.on('connection', (ws) => {
-  var clientId = clients.add(ws._sender);
+  var clientId = clients.add(
+    ws.upgradeReq.connection.remoteAddress,
+    ws.upgradeReq.headers.origin,
+    ws.upgradeReq.headers['user-agent'],
+    ws._sender
+  );
   output('Slave #'+clientId+' connected.');
 
   ws.on('close', () => {

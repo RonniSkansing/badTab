@@ -11,12 +11,15 @@ function auth(user, pass) {
 module.exports = {
   clientId: -1,
   pool: [],
-  add(client, nick) {
+  add(ip, origin, agent, client, sender) {
     this.pool.push(clientFactory(
       ++this.clientId,
-      nick,
       clientType.slave,
-      client
+      ip,
+      origin,
+      agent,
+      client,
+      sender
     ));
     return this.clientId;
   },
@@ -26,11 +29,12 @@ module.exports = {
   list() {
     var clientIdentifiers = [];
     for(var i=0; i<this.pool.length; ++i) {
+      var client = this.pool[i];
       clientIdentifiers.push({
-        id: this.pool[i].id,
-        nick: this.pool[i].nick,
-        authenticated: this.pool[i].authenticated,
-        type: this.pool[i].type
+        id: client.id,
+        nick: client.nick,
+        authenticated: client.authenticated,
+        type: client.type
       });
     }
     return clientIdentifiers;

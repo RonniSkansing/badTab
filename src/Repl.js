@@ -1,5 +1,5 @@
 var repl = require("repl");
-var clients = require('./Client/Clients.js');
+var clients = require('./client/Clients.js');
 var commands = require('./Commands.js');
 var wss = require('./WebSocketServerFactory.js');
 

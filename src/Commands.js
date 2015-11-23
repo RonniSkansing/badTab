@@ -1,5 +1,5 @@
 var config = require('../config.js');
-var jsInterpolate = require('./JsInterpolate');
+var jsInterpolate = require('./JsInterpolate.js');
 
 module.exports = {
   alertDialog: function(message) {

@@ -1,10 +1,14 @@
 module.exports = {
-  "wss": {
+  ws: {
     host: "",
-    port: 8080
+    port: 1666
   },
-  "debug": true,
-  "repl": true,
-  "verbose": true,
-  "src": "./",
+  wss: {
+    host: "",
+    port: 1337
+  },
+  debug: true,
+  repl: true,
+  verbose: true,
+  src: "./",
 };

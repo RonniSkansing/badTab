@@ -1,14 +1,14 @@
-module.exports = (id, nick, type, client) => {
+module.exports = (id, type, ip, origin, agent, sender) => {
   return {
     id: id,
-    nick: nick,
+    nick: "",
     type: type,
     authenticated: false,
     details: {
-      origin: null,
-      ip: null,
-      agent: null
+      origin: origin,
+      ip: ip,
+      agent: agent
     },
-    sender: client,
+    sender: sender,
   };
 }
