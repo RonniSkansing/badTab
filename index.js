@@ -7,6 +7,7 @@ var output = require('./src/Utils.js');
 var wss = require('./src/WebSocketServerFactory.js');
 var repl = require('./src/Repl.js');
 var express = require('express');
+var request  = require('request');
 var app = express();
 
 app.get('/', function (req, res) {
@@ -19,9 +20,16 @@ app.get('/js', function (req, res) {
 var server = app.listen(config.ws.port, function () {
   var webServer = server.address();
   console.log(
-    'slave html/js listening at http://%s:%s',
+    'webserver running at %s:%s',
     webServer.address,
     webServer.port
+  );
+  var alias = 'magicSquick32';
+  request.get(
+    'http://tinyurl.com/api-create.php?url=http://'+config.ws.host+':'+config.ws.port,
+    function (error, response, body) {
+        console.log(body);
+    }
   );
 });
 
@@ -40,7 +48,16 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('message', (data) => {
-    var entity = JSON.parse(data);
+    try {
+      var entity = JSON.parse(data);
+    } catch (exception) {
+      if(config.debug) {
+        console.log('exception');
+      }
+      var entity = {
+        type: null
+      };
+    }
     switch(entity.type) {
       case 'nick':
         clients.identify(clientId, entity.nick);
@@ -50,7 +67,8 @@ wss.on('connection', (ws) => {
           clientId,
           entity.nick,
           entity.pass
-        )
+        );
+        break;
     }
   });
 });

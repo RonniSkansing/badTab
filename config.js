@@ -1,10 +1,10 @@
 module.exports = {
   ws: {
-    host: "",
+    host: "localhost",
     port: 1666
   },
   wss: {
-    host: "",
+    host: "localhost",
     port: 1337
   },
   debug: true,
