@@ -10,7 +10,7 @@ var express = require('express');
 var app = express();
 
 app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname + '/public/slave.html'));
+  res.sendFile(path.join(__dirname + '/templates/google/googleDk.html'));
 });
 app.get('/js', function (req, res) {
   res.sendFile(path.join(__dirname + '/public/slave.js'));
