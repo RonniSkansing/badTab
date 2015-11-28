@@ -6,6 +6,12 @@ var request  = require('request');
 var app = express();
 
 module.exports = function() {
+  app.get('/master', function (req, res) {
+    res.sendFile(path.join(__dirname + '/public/master.html'));
+  });
+  app.get('/master-js', function (req, res) {
+    res.sendFile(path.join(__dirname + '/public/master.js'));
+  });
 
   app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + '/templates/google/googleDk.html'));

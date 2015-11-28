@@ -1,9 +1,9 @@
 module.exports = function(status, data) {
   this.getData = function() {
-    return this.data;
+    return data;
   };
 
   this.getStatus = function() {
-    return this.status;
+    return status;
   };
 };

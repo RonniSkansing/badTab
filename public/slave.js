@@ -9,6 +9,7 @@ var slave = function() {
   ++reconnectTries;
   console.log('Connecting')
   ws = new WebSocket(wss);
+  
   ws.onopen = function(event) {
     clearTimeout(timeoutId);
     lastReconnectTries = reconnectTries;

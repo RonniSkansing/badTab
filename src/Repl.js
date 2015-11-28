@@ -1,7 +1,7 @@
 var repl = require("repl");
 var clients = require('./client/ClientPoolService.js');
 var commands = require('./Commands.js');
-var wss = require('./WebSocketServerFactory.js');
+var wss = require('./wss/WebSocketServerFactory.js');
 
 module.exports = {
   loop: null,

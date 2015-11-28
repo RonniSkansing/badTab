@@ -5,10 +5,9 @@ var clientType = require('./ClientType.js');
 var clientFactory = require('./ClientFactory');
 var clientPool = require('./ClientPool.js');
 var commands = require('./../Commands.js');
-var response = require('./ResponseFactory.js');
+var responseFactory = require('./ResponseFactory.js');
 var utils = require('./../Utils.js');
-var wss = require('./../WebSocketServerFactory.js');
-
+var wss = require('./../wss/WebSocketServerFactory.js');
 
 module.exports = {
   currentSocketId: -1, // @replace with a unique hash
@@ -30,58 +29,45 @@ module.exports = {
     return socketId;
   },
   auth(socketId, user, pass) {
-    var responseJson;
+    var authResponse;
+    console.log(clientAuthService);
     if(clientAuthService.authenticate(user,pass) === false) {
-      responseJson = ResponseFactory('failure', {
-          message: 'Wrong username or password'
+      authResponse = responseFactory('failure', {
+          data: 'Wrong username or password'
       });
     } else {
-      responseJson = ResponseFactory('success', {
-          message: 'Rejuice!'
+      authResponse = responseFactory('success', {
+          data: 'Rejuice!'
       });
       var client = clientPool.get(socketId);
       client.setNick(user);
       client.setType(clientType.master);
     }
-    this.sendJson(
+    this.broadcast(
       client ? client : clientPool.get(socketId),
-      responseJson
+      authResponse
     );
   },
-  broadcastToSlaves(message) {
-    clientPool.getAll().forEach( (client) => {
-      this.sendToType(message, client, clientType.slave);
-    });
-  },
-  broadcastToMasters(message) {
-    clientPool.getAll().forEach( (client) => {
-      this.sendToType(message, client, clientType.master);
-    });
-  },
-  send(client, message) {
-    client.getSender().send(message);
-  },
-  sendToType(message, client, type) {
-    if(client.getType() === type) {
-      this.send(client, message);
+  broadcast(client, data) {
+    if(typeof data !== 'string') {
+      data = JSON.stringify(data);
     }
+    client.getSender().send(data);
   },
-  sendJson(client, data) {
-    this.send(client, JSON.stringify(data));
-  },
-  sendAllJson(data) {
+  broadcastToSlaves(data) {
     clientPool.getAll().forEach( (client) => {
-      this.send(
-        client,
-        JSON.stringify(data)
-      );
+      this.sendToType(data, client, clientType.slave);
     });
   },
-  sendCommand(client, command) {
-    this.send(client, command());
+  broadcastToMasters(data) {
+    clientPool.getAll().forEach( (client) => {
+      this.sendToType(data, client, clientType.master);
+    });
   },
-  sendAllCommand(command) {
-    this.broadcast(command());
+  sendToType(data, client, type) {
+    if(client.getType() === type) {
+      this.broadcast(client, data);
+    }
   },
   sendScript(client, file) {
     var that = this;
@@ -89,7 +75,7 @@ module.exports = {
       if (err) {
         return console.log(err);
       }
-      that.send(client, data);
+      that.broadcast(client, data);
     });
   },
   sendAllScript(file) {
@@ -103,6 +89,6 @@ module.exports = {
   },
   remove(socketId) {
     clientPool.remove(socketId);
-    utils.output('Slave socketId #'+clientSocketId+' Disconnected.');
+    utils.output('Slave socketId #'+socketId+' Disconnected.');
   }
 };
