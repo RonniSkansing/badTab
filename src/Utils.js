@@ -1,7 +1,9 @@
 var config = require('../config.js');
 
-module.exports = function(message) {
-  if(config.verbose) {
-    console.log(' >> '+message);
-  }
+module.exports = new function() {
+  this.output = function(message) {
+    if(config.verbose) {
+      console.log(' >> '+message);
+    }
+  };
 };

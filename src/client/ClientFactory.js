@@ -1,14 +1,13 @@
-module.exports = (id, type, ip, origin, agent, sender) => {
-  return {
-    id: id,
-    nick: "",
-    type: type,
-    authenticated: false,
-    details: {
-      origin: origin,
-      ip: ip,
-      agent: agent
-    },
-    sender: sender,
-  };
+var client = require('./Client.js');
+var clientDetails = require('./ClientDetails.js');
+module.exports = function(socketId, type, ip, origin, agent, sender) {
+  return new client(
+    socketId,
+    null, // nick
+    type,
+    new clientDetails(
+      ip, origin, agent
+    ),
+    sender
+  );
 }

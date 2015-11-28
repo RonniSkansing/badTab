@@ -1,5 +1,6 @@
 module.exports = {
   ws: {
+    enabled: true,
     host: "localhost",
     port: 1666
   },

@@ -3,60 +3,36 @@ var clientType = require('./ClientType');
 var commands = require('./../Commands.js')
 var wss = require('./../WebSocketServerFactory.js');
 
-// @todo replace mock
-function auth(user, pass) {
-  return (user === 'admin' && pass === 'admin');
-}
+var pool = [];
 
 module.exports = {
-  clientId: -1,
-  pool: [],
-  add(ip, origin, agent, client, sender) {
-    this.pool.push(clientFactory(
-      ++this.clientId,
-      clientType.slave,
-      ip,
-      origin,
-      agent,
-      client,
-      sender
-    ));
-    return this.clientId;
+  add(client) {
+    pool.push(
+      client
+    );
   },
-  identify(id, nick) {
-    this.pool[id].nick = nick;
+  identify(socketId, nick) {
+    this.get(socketId).setNick(nick);
   },
-  list() {
-    var clientIdentifiers = [];
-    for(var i=0; i<this.pool.length; ++i) {
-      var client = this.pool[i];
-      clientIdentifiers.push({
-        id: client.id,
-        nick: client.nick,
-        authenticated: client.authenticated,
-        type: client.type
-      });
-    }
-    return clientIdentifiers;
+  get(socketId) {
+    return pool[socketId];
   },
-  get(id) {
-    return this.pool[id];
+  getAll() {
+    return pool;
   },
   getByNick(nick) {
-    return this.pool[
+    return this.get(
       this.getIndexByNick(nick)
-    ];
+    );
   },
   getIndexByNick(nick) {
     for(var i=0;i<this.pool.length;++i) {
-      if(this.pool[i].nick === nick) {
+      if(this.get(i).getNick() === nick) {
         return i;
       }
     }
   },
-  // @todo this doesnt work..
-  remove(id) {
-    this.pool[id] = null;
-    //this.pool.splice(id, 1);
+  remove(socketId) {
+    delete pool[socketId];
   }
 };
