@@ -1,5 +1,5 @@
 //var wss = location.search.match(/tab_slave=([^&]+)/);
-var wss = 'ws://192.168.87.100:8080';
+var wss = 'ws://localhost:1337';
 var ws;
 
 var master = function() {
@@ -18,7 +18,7 @@ var master = function() {
           break;
       }
       console.log(data);
-      
+
     } catch(e) {
       console.log(data);
     }

@@ -1,7 +1,7 @@
 var clientFactory = require('./ClientFactory.js');
 var clientType = require('./ClientType');
 var commands = require('./../Commands.js')
-var wss = require('./../WebSocketServerFactory.js');
+var wss = require('./../wss/WebSocketServerFactory.js');
 
 var pool = [];
 

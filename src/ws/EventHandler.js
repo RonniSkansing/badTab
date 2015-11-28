@@ -1,20 +1,33 @@
 var config = require('./../../config.js');
-var clientService = require('./../client/ClientPoolService.js');
+var clientPoolService = require('./../client/ClientPoolService.js');
+var responseFactory = require('./../client/ResponseFactory.js');
 var wss = require('./../wss/WebSocketServerFactory.js');
 
 module.exports = function() {
   var clientSocketId;
 
-  wss.on('connection', (ws) => {
-    clientSocketId = clientService.addSlave(
+  wss.on('connection', function(ws) {
+    clientSocketId = clientPoolService.addSlave(
       ws.upgradeReq.connection.remoteAddress,
       ws.upgradeReq.headers.origin,
       ws.upgradeReq.headers['user-agent'],
       ws._sender
     );
+    clientPoolService.broadcastToMasters(
+      responseFactory('event', {
+        type: 'connection',
+        socketId: clientSocketId
+      })
+    );
 
     ws.on('close', function() {
-      clientService.remove(clientSocketId);
+      clientPoolService.remove(clientSocketId);
+      clientPoolService.broadcastToMasters(
+        responseFactory('event', {
+          type: 'close',
+          socketId: clientSocketId
+        })
+      );
     });
 
     ws.on('message', (data) => {
@@ -30,15 +43,34 @@ module.exports = function() {
       }
       switch(entity.type) {
         case 'nick':
-          clientService.identify(clientId, entity.nick);
+          var autenticated = clientPoolService.identify(
+            clientSocketId,
+            entity.nick
+          );
+          if(authenticated) {
+            clientPoolService.broadcastToMasters(
+              responseFactory('event', {
+                type: 'auth',
+                socketId: clientSocketId,
+                nick: entity.nick
+              })
+            );
+          }
           break;
         case 'auth':
-          clientService.auth(
-            clientId,
+          clientPoolService.auth(
+            clientSocketId,
             entity.nick,
             entity.pass
           );
-          break;
+          clientPoolService.broadcastToMasters(
+            responseFactory('event', {
+              type: 'auth',
+              result: 'success',
+              socketId: clientSocketId
+            })
+          );
+        break;
       }
     });
   });
