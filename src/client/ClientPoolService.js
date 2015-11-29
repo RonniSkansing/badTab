@@ -4,7 +4,6 @@ var clientAuthService = require('./ClientAuthService.js');
 var clientType = require('./ClientType.js');
 var clientFactory = require('./ClientFactory');
 var clientPool = require('./ClientPool.js');
-var commands = require('./../Commands.js');
 var responseFactory = require('./ResponseFactory.js');
 var utils = require('./../Utils.js');
 var wss = require('./../wss/WebSocketServerFactory.js');
@@ -29,24 +28,33 @@ module.exports = {
     return socketId;
   },
   auth(socketId, user, pass) {
-    var authResponse;
-    console.log(clientAuthService);
+    var client = clientPool.get(socketId);
     if(clientAuthService.authenticate(user,pass) === false) {
-      authResponse = responseFactory('failure', {
-          data: 'Wrong username or password'
-      });
+      this.broadcast(
+        client,
+        responseFactory('auth', {
+            data: 'failure'
+        })
+      );
     } else {
-      authResponse = responseFactory('success', {
-          data: 'Rejuice!'
-      });
-      var client = clientPool.get(socketId);
+      this.broadcast(
+        client,
+        responseFactory('auth', {
+           data: 'success'
+        })
+      );
+      // should not send to masters only client
+      this.broadcast(
+        client,
+        responseFactory('data', {
+          type: 'connections',
+          count: clientPool.count()
+        })
+      );
+
       client.setNick(user);
       client.setType(clientType.master);
     }
-    this.broadcast(
-      client ? client : clientPool.get(socketId),
-      authResponse
-    );
   },
   broadcast(client, data) {
     if(typeof data !== 'string') {

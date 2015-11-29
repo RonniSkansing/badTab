@@ -1,13 +1,14 @@
 var config = require('./../../config.js');
 var clientPoolService = require('./../client/ClientPoolService.js');
+var clientType = require('./../client/clientType.js');
 var responseFactory = require('./../client/ResponseFactory.js');
+
 var wss = require('./../wss/WebSocketServerFactory.js');
 
 module.exports = function() {
-  var clientSocketId;
 
   wss.on('connection', function(ws) {
-    clientSocketId = clientPoolService.addSlave(
+    var clientSocketId = clientPoolService.addSlave(
       ws.upgradeReq.connection.remoteAddress,
       ws.upgradeReq.headers.origin,
       ws.upgradeReq.headers['user-agent'],
@@ -19,7 +20,6 @@ module.exports = function() {
         socketId: clientSocketId
       })
     );
-
     ws.on('close', function() {
       clientPoolService.remove(clientSocketId);
       clientPoolService.broadcastToMasters(
@@ -35,7 +35,7 @@ module.exports = function() {
         var entity = JSON.parse(data);
       } catch (exception) {
         if(config.debug) {
-          console.log('exception');
+          console.log(exception);
         }
         var entity = {
           type: null
@@ -58,19 +58,19 @@ module.exports = function() {
           }
           break;
         case 'auth':
-          clientPoolService.auth(
+          var x = clientPoolService.auth(
             clientSocketId,
             entity.nick,
             entity.pass
           );
-          clientPoolService.broadcastToMasters(
-            responseFactory('event', {
-              type: 'auth',
-              result: 'success',
-              socketId: clientSocketId
-            })
-          );
-        break;
+          break;
+        case 'command':
+          if(clientPoolService.getAll()[clientSocketId].getType() === clientType.master) {
+            clientPoolService.broadcastToSlaves(
+              entity.data.payload
+            );
+          }
+          break;
       }
     });
   });

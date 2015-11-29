@@ -1,18 +1,22 @@
 var clientFactory = require('./ClientFactory.js');
 var clientType = require('./ClientType');
-var commands = require('./../Commands.js')
 var wss = require('./../wss/WebSocketServerFactory.js');
 
 var pool = [];
+var count = 0;
 
 module.exports = {
   add(client) {
     pool.push(
       client
     );
+    ++count;
   },
   identify(socketId, nick) {
     this.get(socketId).setNick(nick);
+  },
+  count: function() {
+    return count;
   },
   get(socketId) {
     return pool[socketId];
@@ -34,5 +38,6 @@ module.exports = {
   },
   remove(socketId) {
     delete pool[socketId];
+    --count;
   }
 };

@@ -1,6 +1,5 @@
 var repl = require("repl");
-var clients = require('./client/ClientPoolService.js');
-var commands = require('./Commands.js');
+var clientPoolService = require('./client/ClientPoolService.js');
 var wss = require('./wss/WebSocketServerFactory.js');
 
 module.exports = {
@@ -13,8 +12,7 @@ module.exports = {
       output: process.stdout
     });
     this.loop.context.wss = wss;
-    this.loop.context.clients = clients;
-    this.loop.context.commands = commands;
+    this.loop.context.service = clientPoolService;
     this.loop.context.repl = this;
   },
   shutdown: () => {

