@@ -1,5 +1,5 @@
 //var wss = location.search.match(/tab_slave=([^&]+)/);
-var wss = 'ws://localhost:1337';
+var wss = 'ws://10.0.12.39:8080';
 var ws;
 
 function promptLogin(username, password) {

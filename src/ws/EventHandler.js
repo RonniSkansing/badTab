@@ -1,6 +1,6 @@
 var config = require('./../../config.js');
 var clientPoolService = require('./../client/ClientPoolService.js');
-var clientType = require('./../client/clientType.js');
+var clientType = require('./../client/ClientType.js');
 var responseFactory = require('./../client/ResponseFactory.js');
 
 var wss = require('./../wss/WebSocketServerFactory.js');
